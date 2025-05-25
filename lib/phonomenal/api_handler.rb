@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Phonomenal
   class ApiHandler
     attr_reader :client, :path, :allowed_methods, :singular
@@ -19,46 +21,46 @@ module Phonomenal
       Phonomenal::Response.new(http_response)
     end
 
-    def prepare_methods! # rubocop:disable Metrics/AbcSize
+    def prepare_methods! # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/MethodLength
       if allowed_methods.include?(:index)
-        def self.list
+        singleton_class.define_method(:list) do
           prepare_response client.get(url_for(path))
         end
       end
 
       if allowed_methods.include?(:create)
-        def self.create(body)
+        singleton_class.define_method(:create) do |body|
           prepare_response client.post(url_for(path), body: body.to_json)
         end
       end
 
       if allowed_methods.include?(:update)
-        def self.update(id, body)
+        singleton_class.define_method(:update) do |id, body|
           prepare_response client.patch(url_for("#{path}/#{id}"), body: body.to_json)
         end
       end
 
       if allowed_methods.include?(:destroy)
-        def self.destroy(id, body)
+        singleton_class.define_method(:destroy) do |id|
           prepare_response client.delete(url_for("#{path}/#{id}"), body: body.to_json)
         end
       end
 
       if allowed_methods.include?(:activate)
-        def self.destroy(id)
+        singleton_class.define_method(:activate) do |id|
           prepare_response client.post(url_for("#{path}/#{id}/activate"))
         end
       end
 
       if allowed_methods.include?(:deactivate)
-        def self.deactivate(id)
+        singleton_class.define_method(:deactivate) do |id|
           prepare_response client.post(url_for("#{path}/#{id}/deactivate"))
         end
       end
 
       return unless allowed_methods.include?(:show)
 
-      def self.show(id)
+      singleton_class.define_method(:show) do |id|
         prepare_response client.get(url_for("#{path}/#{id}"))
       end
     end
