@@ -26,6 +26,12 @@ module Phonomenal
     end
 
     def campaign
+      @campaign ||= Phonomenal::ApiHandler.new(
+        client: self,
+        path: "campaign",
+        allowed_methods: %i[show update],
+        singular: true
+      )
     end
 
     def sessions

@@ -13,12 +13,23 @@ RSpec.describe Phonomenal::Client do
     end
   end
 
-  it "Session login" do
+  it "lists sessions" do
     stub_request(:get, "https://phonomenal.voizworks.com/api/v1/sessions")
       .to_return(status: 200, body: { success: true, sessions: [{ token: "blah", started: "blah" }] }.to_json)
 
     response = client.sessions.list
 
+    expect(response.success?).to eq(true)
+  end
+
+  it "gets campaign details" do
+    stub_request(:any, "https://phonomenal.voizworks.com/api/v1/campaign")
+      .to_return(status: 200, body: { success: true, campaign: [{ token: "blah", started: "blah" }] }.to_json)
+
+    response = client.campaign.show
+    expect(response.success?).to eq(true)
+
+    response = client.campaign.update({ campaign: { foo: "bar" } })
     expect(response.success?).to eq(true)
   end
 end

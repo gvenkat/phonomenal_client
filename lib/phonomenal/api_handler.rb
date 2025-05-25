@@ -37,8 +37,11 @@ module Phonomenal
       end
 
       if allowed_methods.include?(:update)
-        singleton_class.define_method(:update) do |id, body|
-          prepare_response client.class.patch(url_for("#{path}/#{id}"), body: body.to_json)
+        singleton_class.define_method(:update) do |*args|
+          body = singular ? args.first : args.last
+          url = singular ? path : "#{path}/#{args.first}"
+
+          prepare_response client.class.patch(url_for(url), body: body.to_json)
         end
       end
 
@@ -62,8 +65,8 @@ module Phonomenal
 
       return unless allowed_methods.include?(:show)
 
-      singleton_class.define_method(:show) do |id|
-        prepare_response client.class.get(url_for("#{path}/#{id}"))
+      singleton_class.define_method(:show) do |*args|
+        prepare_response client.class.get(url_for(singular ? path : "#{path}/#{args.first}"))
       end
     end
   end
