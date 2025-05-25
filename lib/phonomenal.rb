@@ -38,13 +38,30 @@ module Phonomenal
     end
 
     def sip_configs
+      @sip_configs ||= Phonomenal::ApiHandler.new(
+        client: self,
+        path: "api/v1/sip_configs",
+        allowed_methods: [:index, :create, :update, :destroy, :activate, :deactivate, :show]
+        singular: false
+      )
     end
 
     def members
-      @_members ||= Phonomenal::Members.new(self)
+      @members ||= Phonomenal::ApiHandler.new(
+        client: self,
+        path: "api/v1/members",
+        allowed_methods: [:index, :create, :update, :activate, :deactivate, :show]
+        singular: false
+      )
     end
 
     def calls
+      @calls ||= Phonomenal::ApiHandler.new(
+        client: self,
+        path: "api/v1/calls",
+        allowed_methods: [:create]
+        singular: false
+      )
     end
   end
 end
