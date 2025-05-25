@@ -22,8 +22,7 @@ module Phonomenal
 
       self.class.base_uri base_url
 
-      headers "Content-Type" => "application/json"
-      self.class.headers "X-Phonomenal-Campaign-Key" => campaign_key
+      self.class.headers "X-Phonomenal-Campaign-Key" => campaign_key, "Content-Type" => "application/json"
     end
 
     def campaign
