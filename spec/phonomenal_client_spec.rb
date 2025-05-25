@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe PhonomenalClient do
+RSpec.describe Phonomenal do
   it "has a version number" do
-    expect(PhonomenalClient::VERSION).not_to be nil
+    expect(Phonomenal::VERSION).not_to be nil
   end
 
   it "does something useful" do

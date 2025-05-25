@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require "phonomenal_client"
+require "phonomenal"
+require "webmock"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -11,5 +12,9 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+
+  config.before(:each) do
+    WebMock.disable_net_connect!(allow_localhost: true)
   end
 end

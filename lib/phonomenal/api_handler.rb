@@ -1,20 +1,15 @@
 module Phonomenal
   class ApiHandler
-    attr :client, :path, :allowed_methods, :singular
-
-    MAPPING = {
-      index: { name: :list, method: :get, path: '/', args: false, body: false }
-    }
+    attr_reader :client, :path, :allowed_methods, :singular
 
     def initialize(client:, path:, allowed_methods:, singular:)
-      @client = client,
+      @client = client
       @path = path
       @allowed_methods = Set.new(allowed_methods)
       @singular = singular
 
       prepare_methods!
     end
-
 
     def url_for(partial_path)
       "/api/v1/#{partial_path}"
@@ -24,7 +19,7 @@ module Phonomenal
       Phonomenal::Response.new(http_response)
     end
 
-    def prepare_methods!
+    def prepare_methods! # rubocop:disable Metrics/AbcSize
       if allowed_methods.include?(:index)
         def self.list
           prepare_response client.get(url_for(path))
@@ -61,12 +56,11 @@ module Phonomenal
         end
       end
 
-      if allowed_methods.include?(:show)
-        def self.show(id)
-          prepare_response client.get(url_for("#{path}/#{id}"))
-        end
+      return unless allowed_methods.include?(:show)
+
+      def self.show(id)
+        prepare_response client.get(url_for("#{path}/#{id}"))
       end
     end
-
   end
 end

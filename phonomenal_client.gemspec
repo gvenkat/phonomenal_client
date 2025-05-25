@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "lib/phonomenal_client/version"
+require_relative "lib/phonomenal/version"
 
 Gem::Specification.new do |spec|
   spec.name = "phonomenal_client"
-  spec.version = PhonomenalClient::VERSION
+  spec.version = Phonomenal::VERSION
   spec.authors = ["Venkatakrishnan Ganesh"]
   spec.email = ["venkatk@voizworks.com"]
 
