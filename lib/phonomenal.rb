@@ -31,7 +31,7 @@ module Phonomenal
     def sessions
       @sessions ||= Phonomenal::ApiHandler.new(
         client: self,
-        path: "api/v1/sessions",
+        path: "sessions",
         allowed_methods: %i[index create update destroy],
         singular: false
       )
@@ -40,7 +40,7 @@ module Phonomenal
     def sip_configs
       @sip_configs ||= Phonomenal::ApiHandler.new(
         client: self,
-        path: "api/v1/sip_configs",
+        path: "sip_configs",
         allowed_methods: %i[index create update destroy activate deactivate show],
         singular: false
       )
@@ -49,7 +49,7 @@ module Phonomenal
     def members
       @members ||= Phonomenal::ApiHandler.new(
         client: self,
-        path: "api/v1/members",
+        path: "members",
         allowed_methods: %i[index create update activate deactivate show],
         singular: false
       )
@@ -58,7 +58,7 @@ module Phonomenal
     def calls
       @calls ||= Phonomenal::ApiHandler.new(
         client: self,
-        path: "api/v1/calls",
+        path: "calls",
         allowed_methods: [:create],
         singular: false
       )
