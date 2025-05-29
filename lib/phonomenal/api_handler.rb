@@ -47,7 +47,7 @@ module Phonomenal
 
       if allowed_methods.include?(:destroy)
         singleton_class.define_method(:destroy) do |id|
-          prepare_response client.class.delete(url_for("#{path}/#{id}"), body: body.to_json)
+          prepare_response client.class.delete(url_for("#{path}/#{id}"))
         end
       end
 
