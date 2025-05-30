@@ -3,7 +3,7 @@
 require "phonomenal/response"
 
 module Phonomenal
-  class ApiHandler
+  class ApiHandler # rubocop:disable Style/Documentation
     attr_reader :client, :path, :allowed_methods, :singular
 
     def initialize(client:, path:, allowed_methods:, singular:)
@@ -15,15 +15,15 @@ module Phonomenal
       prepare_methods!
     end
 
-    def url_for(partial_path)
-      "#{client.base_url}/api/v1/#{partial_path}"
+    def url_for(...)
+      client.url_for(...)
     end
 
     def prepare_response(http_response)
       Phonomenal::Response.new(http_response)
     end
 
-    def prepare_methods! # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/MethodLength
+    def prepare_methods! # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
       if allowed_methods.include?(:index)
         singleton_class.define_method(:list) do
           prepare_response client.class.get(url_for(path))

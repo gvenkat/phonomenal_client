@@ -3,6 +3,7 @@
 require "httparty"
 require_relative "phonomenal/version"
 require_relative "phonomenal/api_handler"
+require_relative "phonomenal/calls"
 
 module Phonomenal
   class Error < StandardError; end
@@ -23,6 +24,10 @@ module Phonomenal
       self.class.base_uri base_url
 
       self.class.headers "X-Phonomenal-Campaign-Key" => campaign_key, "Content-Type" => "application/json"
+    end
+
+    def url_for(partial_path)
+      "#{base_url}/api/v1/#{partial_path}"
     end
 
     def campaign
@@ -62,12 +67,7 @@ module Phonomenal
     end
 
     def calls
-      @calls ||= Phonomenal::ApiHandler.new(
-        client: self,
-        path: "calls",
-        allowed_methods: [:create],
-        singular: false
-      )
+      @calls ||= Phonomenal::Calls.new(self)
     end
   end
 end
