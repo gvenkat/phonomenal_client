@@ -23,6 +23,13 @@ module Phonomenal
       Phonomenal::Response.new(http_response)
     end
 
+    # Just assume all the methods are on members
+    def add_method!(method_name:, method: :post)
+      singleton_class.define_method(method_name) do |id|
+        prepare_response client.class.send(method, url_for("#{path}/#{id}/#{method_name}"))
+      end
+    end
+
     def prepare_methods! # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
       if allowed_methods.include?(:index)
         singleton_class.define_method(:list) do

@@ -40,12 +40,19 @@ module Phonomenal
     end
 
     def sessions
-      @sessions ||= Phonomenal::ApiHandler.new(
-        client: self,
-        path: "sessions",
-        allowed_methods: %i[index create update destroy],
-        singular: false
-      )
+      unless @sessions
+        @sessions = Phonomenal::ApiHandler.new(
+          client: self,
+          path: "sessions",
+          allowed_methods: %i[index create update destroy],
+          singular: false
+        )
+
+        @sessions.add_method!(method_name: :start_break, method: :post)
+        @sessions.add_method!(method_name: :end_break, method: :post)
+      end
+
+      @sessions
     end
 
     def sip_configs
