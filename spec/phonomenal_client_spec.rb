@@ -22,6 +22,14 @@ RSpec.describe Phonomenal::Client do
     expect(response.success?).to eq(true)
   end
 
+  it "allows you to take a break on active session" do
+    stub_request(:post, "https://phonomenal.voizworks.com/api/v1/sessions/1/start_break")
+      .to_return(status: 200, body: { success: true, session: { token: "blah", started: "blah" } }.to_json)
+
+    response = client.sessions.start_break(1)
+    expect(response.success?).to eq(true)
+  end
+
   it "gets campaign details" do
     stub_request(:any, "https://phonomenal.voizworks.com/api/v1/campaign")
       .to_return(status: 200, body: { success: true, campaign: [{ token: "blah", started: "blah" }] }.to_json)
