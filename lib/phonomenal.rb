@@ -64,6 +64,15 @@ module Phonomenal
       )
     end
 
+    def black_list_phones
+      @black_list_phones ||= Phonomenal::ApiHandler.new(
+        client: self,
+        path: "black_list_phones",
+        allowed_methods: %i[index create update destroy],
+        singular: false
+      )
+    end
+
     def members
       @members ||= Phonomenal::ApiHandler.new(
         client: self,
