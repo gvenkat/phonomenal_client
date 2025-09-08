@@ -82,6 +82,15 @@ module Phonomenal
       )
     end
 
+    def member_groups
+      @member_groups ||= Phonomenal::ApiHandler.new(
+        client: self,
+        path: "member_groups",
+        allowed_methods: %i[index create update show destroy],
+        singular: false
+      )
+    end
+
     def calls
       @calls ||= Phonomenal::Calls.new(self)
     end
