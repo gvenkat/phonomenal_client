@@ -8,7 +8,7 @@ RSpec.describe Phonomenal::Client do
   end
 
   it "Implements all resources" do
-    %w[sessions members calls sip_configs campaign].each do |met|
+    %w[sessions members calls sip_configs campaign leads].each do |met|
       expect(client).to respond_to(met)
     end
   end
