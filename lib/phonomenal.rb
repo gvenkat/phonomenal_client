@@ -39,7 +39,7 @@ module Phonomenal
       )
     end
 
-    def sessions
+    def sessions # rubocop:disable Metrics/MethodLength
       unless @sessions
         @sessions = Phonomenal::ApiHandler.new(
           client: self,
@@ -50,6 +50,7 @@ module Phonomenal
 
         @sessions.add_method!(method_name: :start_break, method: :post)
         @sessions.add_method!(method_name: :end_break, method: :post)
+        @sessions.add_method!(method_name: :dispose_call, method: :post)
       end
 
       @sessions
@@ -93,6 +94,10 @@ module Phonomenal
 
     def calls
       @calls ||= Phonomenal::Calls.new(self)
+    end
+
+    def leads
+      @leads ||= Phonomenal::Leads.new(self)
     end
   end
 end

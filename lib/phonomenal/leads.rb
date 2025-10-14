@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
 module Phonomenal
-  VERSION = "0.2.0"
+  Leads = Struct.new(:client) do
+  end
 end
