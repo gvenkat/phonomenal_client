@@ -25,8 +25,13 @@ module Phonomenal
 
     # Just assume all the methods are on members
     def add_method!(method_name:, method: :post)
-      singleton_class.define_method(method_name) do |id|
-        prepare_response client.class.send(method, url_for("#{path}/#{id}/#{method_name}"))
+      singleton_class.define_method(method_name) do |id, data = nil|
+        args = if data.nil?
+                 {}
+               else
+                 method_name == :post ? { body: data.to_json } : { query: data }
+               end
+        prepare_response client.class.send(method, url_for("#{path}/#{id}/#{method_name}"), **args)
       end
     end
 
