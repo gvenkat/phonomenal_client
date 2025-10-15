@@ -7,7 +7,7 @@ module Phonomenal
     end
 
     def make_response(method, path, **kwargs)
-      Response.new(client.send(method, client.url_for(path), **kwargs))
+      Response.new(client.class.send(method, client.url_for(path), **kwargs))
     end
 
     def create(object)
