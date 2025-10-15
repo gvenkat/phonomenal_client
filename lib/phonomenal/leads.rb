@@ -6,7 +6,7 @@ module Phonomenal
       Response.new(client.class.get(client.url_for("/leads"), query: { filter: filter }))
     end
 
-    def _make_response(method, path, **kwargs)
+    def make_response(method, path, **kwargs)
       Response.new(client.send(method, client.url_for(path), **kwargs))
     end
 
