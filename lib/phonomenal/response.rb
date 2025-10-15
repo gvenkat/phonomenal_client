@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 module Phonomenal
-  class Response < Struct.new(:http_response)
+  Response = Struct.new(:http_response) do
     def json
       http_response.parsed_response
     end

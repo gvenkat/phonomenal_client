@@ -4,6 +4,7 @@ require "httparty"
 require_relative "phonomenal/version"
 require_relative "phonomenal/api_handler"
 require_relative "phonomenal/calls"
+require_relative "phonomenal/leads"
 
 module Phonomenal
   class Error < StandardError; end
