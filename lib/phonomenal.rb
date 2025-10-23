@@ -66,15 +66,6 @@ module Phonomenal
       )
     end
 
-    def black_list_phones
-      @black_list_phones ||= Phonomenal::ApiHandler.new(
-        client: self,
-        path: "black_list_phones",
-        allowed_methods: %i[index create update destroy],
-        singular: false
-      )
-    end
-
     def members
       @members ||= Phonomenal::ApiHandler.new(
         client: self,
@@ -84,13 +75,22 @@ module Phonomenal
       )
     end
 
-    def member_groups
-      @member_groups ||= Phonomenal::ApiHandler.new(
-        client: self,
-        path: "member_groups",
-        allowed_methods: %i[index create update show destroy],
-        singular: false
-      )
+    %w[member_groups black_list_phones holidays inbound_schedule_entries].each do |method|
+      define_method method do # rubocop:disable Metrics/MethodLength
+        handler = instance_variable_get(:"@#{method}")
+
+        unless handler
+          handler = Phonomenal::ApiHandler.new(
+            client: self,
+            path: method,
+            allowed_methods: %i[index create update show destroy],
+            singular: false
+          )
+          instance_variable_set(:"@#{method}", handler)
+        end
+
+        handler
+      end
     end
 
     def calls

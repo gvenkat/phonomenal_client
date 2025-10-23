@@ -11,6 +11,9 @@ RSpec.describe Phonomenal::Client do
     %w[sessions members calls sip_configs campaign leads].each do |met|
       expect(client).to respond_to(met)
     end
+
+    expect(client.black_list_phones).to be_truthy
+    expect(client.black_list_phones).to eq(client.black_list_phones)
   end
 
   it "lists sessions" do
