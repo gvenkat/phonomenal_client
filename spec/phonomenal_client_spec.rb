@@ -17,7 +17,11 @@ RSpec.describe Phonomenal::Client do
   end
 
   it "has a method to remove all webhooks from campaign" do
+    stub_request(:delete, "https://phonomenal.voizworks.com/api/v1/campaign/webhooks")
+      .to_return(status: 200, body: { success: true, sessions: [{ token: "blah", started: "blah" }] }.to_json)
+
     expect(client.campaign).to respond_to(:clear_webhooks)
+    expect { client.campaign.clear_webhooks }.not_to raise_error
   end
 
   it "lists sessions" do
