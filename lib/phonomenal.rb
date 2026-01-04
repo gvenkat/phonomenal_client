@@ -38,7 +38,7 @@ module Phonomenal
         allowed_methods: %i[show update],
         singular: true
       ).tap do |handler|
-        handler.add_method!(method_name: :webhooks, method: :delete)
+        handler.add_method!(method_name: :clear_webhooks, method: :delete, path: "webhooks")
       end
     end
 
