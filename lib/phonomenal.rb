@@ -37,7 +37,9 @@ module Phonomenal
         path: "campaign",
         allowed_methods: %i[show update],
         singular: true
-      )
+      ).tap do |handler|
+        handler.add_method!(method_name: :webhooks, method: :delete)
+      end
     end
 
     def sessions # rubocop:disable Metrics/MethodLength
