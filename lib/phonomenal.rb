@@ -11,12 +11,11 @@ module Phonomenal
 
   class Client
     include ::HTTParty
-
     DEFAULT_BASE_URL = "https://phonomenal.voizworks.com"
 
-    format :json
-
     attr_reader :base_url, :campaign_key
+
+    format :json
 
     def initialize(campaign_key:, base_url: nil)
       @base_url = base_url || DEFAULT_BASE_URL
@@ -38,7 +37,7 @@ module Phonomenal
         allowed_methods: %i[show update],
         singular: true
       ).tap do |handler|
-        handler.add_method!(method_name: :clear_webhooks, method: :delete, path: "webhooks")
+        handler.add_method!(method_name: :clear_webhooks, method: :delete, url_path: "webhooks")
       end
     end
 

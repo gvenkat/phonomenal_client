@@ -16,6 +16,10 @@ RSpec.describe Phonomenal::Client do
     expect(client.black_list_phones).to eq(client.black_list_phones)
   end
 
+  it "has a method to remove all webhooks from campaign" do
+    expect(client.campaign).to respond_to(:clear_webhooks)
+  end
+
   it "lists sessions" do
     stub_request(:get, "https://phonomenal.voizworks.com/api/v1/sessions")
       .to_return(status: 200, body: { success: true, sessions: [{ token: "blah", started: "blah" }] }.to_json)
