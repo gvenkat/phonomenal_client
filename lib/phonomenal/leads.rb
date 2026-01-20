@@ -27,5 +27,13 @@ module Phonomenal
     def set_follow_up(lead_id, follow_up_at)
       make_response :post, "/leads/#{lead_id}/set_follow_up", body: { follow_up_at: follow_up_at }.to_json
     end
+
+    def assign(lead_id, member_email)
+      make_response :post, "/leads/#{lead_id}/assign", body: { member_email: member_email }.to_json
+    end
+
+    def unassign(lead_id)
+      make_response :post, "/leads/#{lead_id}/unassign", body: {}.to_json
+    end
   end
 end

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    phonomenal_client (0.2.6)
+    phonomenal_client (0.2.11)
       httparty
 
 GEM
