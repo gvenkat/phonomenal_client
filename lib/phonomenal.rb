@@ -53,6 +53,8 @@ module Phonomenal
         @sessions.add_method!(method_name: :start_break, method: :post)
         @sessions.add_method!(method_name: :end_break, method: :post)
         @sessions.add_method!(method_name: :dispose_call, method: :post)
+        @sessions.add_method!(method_name: :switch_to_manual, method: :post)
+        @sessions.add_method!(method_name: :switch_to_auto, method: :post)
       end
 
       @sessions
