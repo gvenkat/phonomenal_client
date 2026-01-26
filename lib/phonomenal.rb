@@ -10,25 +10,57 @@ module Phonomenal
   class Error < StandardError; end
 
   class Client
-    include ::HTTParty
     DEFAULT_BASE_URL = "https://phonomenal.voizworks.com"
 
     attr_reader :base_url, :campaign_key
 
-    format :json
-
     def initialize(campaign_key:, base_url: nil)
       @base_url = base_url || DEFAULT_BASE_URL
       @campaign_key = campaign_key
+    end
 
-      self.class.base_uri base_url
-
-      self.class.headers "X-Phonomenal-Campaign-Key" => campaign_key, "Content-Type" => "application/json"
+    def headers
+      {
+        "X-Phonomenal-Campaign-Key" => campaign_key,
+        "Content-Type" => "application/json"
+      }
     end
 
     def url_for(partial_path)
       "#{base_url}/api/v1/#{partial_path}"
     end
+
+    # Add helper methods for HTTP requests that use instance-level config
+    def get(path, options = {})
+      HTTParty.get(url_for(path), default_options.merge(options))
+    end
+
+    def post(path, options = {})
+      HTTParty.post(url_for(path), default_options.merge(options))
+    end
+
+    def put(path, options = {})
+      HTTParty.put(url_for(path), default_options.merge(options))
+    end
+
+    def patch(path, options = {})
+      HTTParty.patch(url_for(path), default_options.merge(options))
+    end
+
+    def delete(path, options = {})
+      HTTParty.delete(url_for(path), default_options.merge(options))
+    end
+
+    private
+
+    def default_options
+      {
+        headers: headers,
+        format: :json
+      }
+    end
+
+    public
 
     def campaign
       @campaign ||= Phonomenal::ApiHandler.new(
@@ -49,14 +81,12 @@ module Phonomenal
           allowed_methods: %i[index create update destroy],
           singular: false
         )
-
         @sessions.add_method!(method_name: :start_break, method: :post)
         @sessions.add_method!(method_name: :end_break, method: :post)
         @sessions.add_method!(method_name: :dispose_call, method: :post)
         @sessions.add_method!(method_name: :switch_to_manual, method: :post)
         @sessions.add_method!(method_name: :switch_to_auto, method: :post)
       end
-
       @sessions
     end
 
@@ -81,7 +111,6 @@ module Phonomenal
     %w[member_groups black_list_phones holidays inbound_schedule_entries].each do |method|
       define_method method do # rubocop:disable Metrics/MethodLength
         handler = instance_variable_get(:"@#{method}")
-
         unless handler
           handler = Phonomenal::ApiHandler.new(
             client: self,
@@ -91,7 +120,6 @@ module Phonomenal
           )
           instance_variable_set(:"@#{method}", handler)
         end
-
         handler
       end
     end
