@@ -42,13 +42,13 @@ module Phonomenal
     def prepare_methods! # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
       if allowed_methods.include?(:index)
         singleton_class.define_method(:list) do
-          prepare_response client.class.get(url_for(path))
+          prepare_response client.get(url_for(path))
         end
       end
 
       if allowed_methods.include?(:create)
         singleton_class.define_method(:create) do |body|
-          prepare_response client.class.post(url_for(path), body: body.to_json)
+          prepare_response client.post(url_for(path), body: body.to_json)
         end
       end
 
@@ -57,32 +57,32 @@ module Phonomenal
           body = singular ? args.first : args.last
           url = singular ? path : "#{path}/#{args.first}"
 
-          prepare_response client.class.patch(url_for(url), body: body.to_json)
+          prepare_response client.patch(url_for(url), body: body.to_json)
         end
       end
 
       if allowed_methods.include?(:destroy)
         singleton_class.define_method(:destroy) do |id|
-          prepare_response client.class.delete(url_for("#{path}/#{id}"))
+          prepare_response client.delete(url_for("#{path}/#{id}"))
         end
       end
 
       if allowed_methods.include?(:activate)
         singleton_class.define_method(:activate) do |id|
-          prepare_response client.class.post(url_for("#{path}/#{id}/activate"))
+          prepare_response client.post(url_for("#{path}/#{id}/activate"))
         end
       end
 
       if allowed_methods.include?(:deactivate)
         singleton_class.define_method(:deactivate) do |id|
-          prepare_response client.class.post(url_for("#{path}/#{id}/deactivate"))
+          prepare_response client.post(url_for("#{path}/#{id}/deactivate"))
         end
       end
 
       return unless allowed_methods.include?(:show)
 
       singleton_class.define_method(:show) do |*args|
-        prepare_response client.class.get(url_for(singular ? path : "#{path}/#{args.first}"))
+        prepare_response client.get(url_for(singular ? path : "#{path}/#{args.first}"))
       end
     end
   end
