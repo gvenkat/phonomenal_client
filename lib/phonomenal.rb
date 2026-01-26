@@ -31,24 +31,24 @@ module Phonomenal
     end
 
     # Add helper methods for HTTP requests that use instance-level config
-    def get(path, options = {})
-      HTTParty.get(url_for(path), default_options.merge(options))
+    def get(url, options = {})
+      HTTParty.get(url, default_options.merge(options))
     end
 
-    def post(path, options = {})
-      HTTParty.post(url_for(path), default_options.merge(options))
+    def post(url, options = {})
+      HTTParty.post(url, default_options.merge(options))
     end
 
-    def put(path, options = {})
-      HTTParty.put(url_for(path), default_options.merge(options))
+    def put(url, options = {})
+      HTTParty.put(url, default_options.merge(options))
     end
 
-    def patch(path, options = {})
-      HTTParty.patch(url_for(path), default_options.merge(options))
+    def patch(url, options = {})
+      HTTParty.patch(url, default_options.merge(options))
     end
 
-    def delete(path, options = {})
-      HTTParty.delete(url_for(path), default_options.merge(options))
+    def delete(url, options = {})
+      HTTParty.delete(url, default_options.merge(options))
     end
 
     private
