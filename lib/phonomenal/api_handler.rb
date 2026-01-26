@@ -35,7 +35,7 @@ module Phonomenal
         # URL
         url = url_for([path, (singular ? nil : id), url_path || method_name].compact.join("/"))
 
-        prepare_response client.class.send(method, url, **args)
+        prepare_response client.send(method, url, **args)
       end
     end
 
