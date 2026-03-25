@@ -91,12 +91,17 @@ module Phonomenal
     end
 
     def sip_configs
-      @sip_configs ||= Phonomenal::ApiHandler.new(
-        client: self,
-        path: "sip_configs",
-        allowed_methods: %i[index create update destroy activate deactivate show],
-        singular: false
-      )
+      unless @sip_configs
+        @sip_configs = Phonomenal::ApiHandler.new(
+          client: self,
+          path: "sip_configs",
+          allowed_methods: %i[index create update destroy activate deactivate show],
+          singular: false
+        )
+        @sip_configs.add_method!(method_name: "borrow", method: :post)
+      end
+
+      @sip_configs
     end
 
     def members

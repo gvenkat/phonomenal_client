@@ -16,6 +16,15 @@ RSpec.describe Phonomenal::Client do
     expect(client.black_list_phones).to eq(client.black_list_phones)
   end
 
+  it "allows user to borrow a did" do
+    stub_request(:post, "https://phonomenal.voizworks.com/api/v1/sip_configs/borrow")
+      .to_return(status: 200, body: { success: true, sip_config: { did: "9980333099" } }.to_json)
+
+    response = client.sip_configs.borrow
+
+    expect(response.success?).to eq(true)
+  end
+
   it "has a method to remove all webhooks from campaign" do
     stub_request(:delete, "https://phonomenal.voizworks.com/api/v1/campaign/webhooks")
       .to_return(status: 200, body: { success: true, sessions: [{ token: "blah", started: "blah" }] }.to_json)
