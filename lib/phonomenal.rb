@@ -12,18 +12,54 @@ module Phonomenal
   class Client
     DEFAULT_BASE_URL = "https://phonomenal.voizworks.com"
 
-    attr_reader :base_url, :campaign_key
+    def self.for_campaign(campaign_key, base_url: nil)
+      new(campaign_key: campaign_key, base_url: base_url)
+    end
 
-    def initialize(campaign_key:, base_url: nil)
+    def self.for_account(account_key, base_url: nil)
+      new(account_key: account_key, base_url: base_url)
+    end
+
+    def self.with_campaign(*args, **kwargs)
+      yield for_campaign(*args, **kwargs)
+    end
+
+    def self.with_account(*args, **kwargs)
+      yield for_account(*args, **kwargs)
+    end
+
+    attr_reader :base_url, :campaign_key, :account_key
+
+    def initialize(campaign_key: nil, account_key: nil, base_url: nil)
+      if campaign_key && account_key
+        raise ArgumentError, "Provide either campaign_key or account_key, not both"
+      end
+
+      unless campaign_key || account_key
+        raise ArgumentError, "Either campaign_key or account_key is required"
+      end
+
       @base_url = base_url || DEFAULT_BASE_URL
       @campaign_key = campaign_key
+      @account_key = account_key
+    end
+
+    def campaign_context?
+      !@campaign_key.nil?
+    end
+
+    def account_context?
+      !@account_key.nil?
     end
 
     def headers
-      {
-        "X-Phonomenal-Campaign-Key" => campaign_key,
-        "Content-Type" => "application/json"
-      }
+      key_header = if campaign_context?
+        { "X-Phonomenal-Campaign-Key" => campaign_key }
+      else
+        { "X-Phonomenal-Account-Key" => account_key }
+      end
+
+      key_header.merge("Content-Type" => "application/json")
     end
 
     def url_for(partial_path)
