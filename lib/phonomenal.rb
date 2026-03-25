@@ -5,6 +5,8 @@ require_relative "phonomenal/version"
 require_relative "phonomenal/api_handler"
 require_relative "phonomenal/calls"
 require_relative "phonomenal/leads"
+require_relative "phonomenal/campaign_context"
+require_relative "phonomenal/account_context"
 
 module Phonomenal
   class Error < StandardError; end
@@ -31,17 +33,13 @@ module Phonomenal
     attr_reader :base_url, :campaign_key, :account_key
 
     def initialize(campaign_key: nil, account_key: nil, base_url: nil)
-      if campaign_key && account_key
-        raise ArgumentError, "Provide either campaign_key or account_key, not both"
-      end
-
-      unless campaign_key || account_key
-        raise ArgumentError, "Either campaign_key or account_key is required"
-      end
+      raise ArgumentError, "Provide either campaign_key or account_key, not both" if campaign_key && account_key
+      raise ArgumentError, "Either campaign_key or account_key is required" unless campaign_key || account_key
 
       @base_url = base_url || DEFAULT_BASE_URL
       @campaign_key = campaign_key
       @account_key = account_key
+      extend(campaign_context? ? Phonomenal::CampaignContext : Phonomenal::AccountContext)
     end
 
     def campaign_context?
@@ -53,11 +51,12 @@ module Phonomenal
     end
 
     def headers
-      key_header = if campaign_context?
-        { "X-Phonomenal-Campaign-Key" => campaign_key }
-      else
-        { "X-Phonomenal-Account-Key" => account_key }
-      end
+      key_header =
+        if campaign_context?
+          { "X-Phonomenal-Campaign-Key" => campaign_key }
+        else
+          { "X-Phonomenal-Account-Key" => account_key }
+        end
 
       key_header.merge("Content-Type" => "application/json")
     end
@@ -94,92 +93,6 @@ module Phonomenal
         headers: headers,
         format: :json
       }
-    end
-
-    public
-
-    def campaign
-      @campaign ||= Phonomenal::ApiHandler.new(
-        client: self,
-        path: "campaign",
-        allowed_methods: %i[show update],
-        singular: true
-      ).tap do |handler|
-        handler.add_method!(method_name: :clear_webhooks, method: :delete, url_path: "webhooks")
-      end
-    end
-
-    def sessions # rubocop:disable Metrics/MethodLength
-      unless @sessions
-        @sessions = Phonomenal::ApiHandler.new(
-          client: self,
-          path: "sessions",
-          allowed_methods: %i[index create update destroy],
-          singular: false
-        )
-        @sessions.add_method!(method_name: :start_break, method: :post)
-        @sessions.add_method!(method_name: :end_break, method: :post)
-        @sessions.add_method!(method_name: :dispose_call, method: :post)
-        @sessions.add_method!(method_name: :switch_to_manual, method: :post)
-        @sessions.add_method!(method_name: :switch_to_auto, method: :post)
-      end
-      @sessions
-    end
-
-    def sip_configs
-      unless @sip_configs
-        @sip_configs = Phonomenal::ApiHandler.new(
-          client: self,
-          path: "sip_configs",
-          allowed_methods: %i[index create update destroy activate deactivate show],
-          singular: false
-        )
-        @sip_configs.add_method!(method_name: "borrow", method: :post)
-      end
-
-      @sip_configs
-    end
-
-    def members
-      @members ||= Phonomenal::ApiHandler.new(
-        client: self,
-        path: "members",
-        allowed_methods: %i[index create update activate deactivate show],
-        singular: false
-      )
-    end
-
-    def global_dids
-      @global_dids ||= Phonomenal::ApiHandler.new(
-        client: self,
-        path: "global_dids",
-        allowed_methods: %i[index],
-        singular: false
-      )
-    end
-
-    %w[member_groups black_list_phones holidays inbound_schedule_entries].each do |method|
-      define_method method do # rubocop:disable Metrics/MethodLength
-        handler = instance_variable_get(:"@#{method}")
-        unless handler
-          handler = Phonomenal::ApiHandler.new(
-            client: self,
-            path: method,
-            allowed_methods: %i[index create update show destroy],
-            singular: false
-          )
-          instance_variable_set(:"@#{method}", handler)
-        end
-        handler
-      end
-    end
-
-    def calls
-      @calls ||= Phonomenal::Calls.new(self)
-    end
-
-    def leads
-      @leads ||= Phonomenal::Leads.new(self)
     end
   end
 end
