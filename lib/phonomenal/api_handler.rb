@@ -41,8 +41,8 @@ module Phonomenal
 
     def prepare_methods! # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
       if allowed_methods.include?(:index)
-        singleton_class.define_method(:list) do
-          prepare_response client.get(url_for(path))
+        singleton_class.define_method(:list) do |**args|
+          prepare_response client.get(url_for(path), query: args)
         end
       end
 

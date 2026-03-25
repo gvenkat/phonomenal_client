@@ -108,6 +108,15 @@ module Phonomenal
       )
     end
 
+    def global_dids
+      @global_dids ||= Phonomenal::ApiHandler.new(
+        client: self,
+        path: "global_dids",
+        allowed_methods: %i[index],
+        singular: false
+      )
+    end
+
     %w[member_groups black_list_phones holidays inbound_schedule_entries].each do |method|
       define_method method do # rubocop:disable Metrics/MethodLength
         handler = instance_variable_get(:"@#{method}")

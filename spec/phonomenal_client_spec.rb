@@ -51,4 +51,19 @@ RSpec.describe Phonomenal::Client do
     response = client.campaign.update({ campaign: { foo: "bar" } })
     expect(response.success?).to eq(true)
   end
+
+  it "searches global dids" do
+    stub_request(:get, "https://phonomenal.voizworks.com/api/v1/global_dids")
+      .to_return(status: 200, body: { success: true, global_dids: [{ did: "0802332332222" }] }.to_json)
+
+    stub_request(:get, "https://phonomenal.voizworks.com/api/v1/global_dids?start_with=079")
+      .to_return(status: 200, body: { success: true, global_dids: [] }.to_json)
+
+    response = client.global_dids.list
+    expect(response.success?).to eq(true)
+
+    response = client.global_dids.list(start_with: "079")
+    expect(response.success?).to eq(true)
+    expect(response.json["global_dids"]).to eq([])
+  end
 end
