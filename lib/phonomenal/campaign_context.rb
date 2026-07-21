@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Phonomenal
+  # :nodoc:
   module CampaignContext
     def campaign
       @campaign ||= Phonomenal::ApiHandler.new(
@@ -62,7 +63,7 @@ module Phonomenal
       )
     end
 
-    %w[member_groups black_list_phones holidays inbound_schedule_entries].each do |method|
+    %w[member_groups black_list_phones holidays inbound_schedule_entries voice_messages].each do |method|
       define_method method do # rubocop:disable Metrics/MethodLength
         handler = instance_variable_get(:"@#{method}")
         unless handler
