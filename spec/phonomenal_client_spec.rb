@@ -82,6 +82,13 @@ RSpec.describe Phonomenal::Client do
   end
 
   describe "account context" do
+    it "implements language listing" do
+      expect(account_client).to respond_to(:languages)
+    end
+
+    it "implements voices listing" do
+      expect(account_client).to respond_to(:voices)
+    end
     it "implements campaigns resource" do
       expect(account_client).to respond_to(:campaigns)
     end
