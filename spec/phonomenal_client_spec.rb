@@ -161,6 +161,77 @@ RSpec.describe Phonomenal::Client do
     expect(response.success?).to eq(true)
   end
 
+  describe "leads" do
+    # Note the doubled slash: `url_for` joins "/api/v1/" with a leading-slash path.
+    # Rails normalises it away, so these are the URLs actually requested.
+    let(:base) { "https://phonomenal.voizworks.com/api/v1//leads" }
+
+    def stub_lead_post(path, body: nil)
+      stub = stub_request(:post, "#{base}/#{path}")
+      stub = stub.with(body: body) unless body.nil?
+      stub.to_return(status: 200, body: { success: true, lead: { id: 1 } }.to_json)
+    end
+
+    it "bumps a lead with no schedule" do
+      request = stub_lead_post("1/bump", body: {}.to_json)
+
+      expect(client.leads.bump(1).success?).to eq(true)
+      expect(request).to have_been_requested
+    end
+
+    it "bumps a lead with a scheduled time" do
+      request = stub_lead_post("1/bump", body: { bump_at: "2026-09-01 18:30:00" }.to_json)
+
+      expect(client.leads.bump(1, bump_at: "2026-09-01 18:30:00").success?).to eq(true)
+      expect(request).to have_been_requested
+    end
+
+    it "unbumps a lead" do
+      request = stub_lead_post("1/unbump", body: {}.to_json)
+
+      expect(client.leads.unbump(1).success?).to eq(true)
+      expect(request).to have_been_requested
+    end
+
+    it "posts state changes to the routes the server actually exposes" do
+      %w[block restore unbump unset_follow_up].each do |action|
+        request = stub_lead_post("1/#{action}")
+
+        client.leads.public_send(action, 1)
+        expect(request).to have_been_requested
+      end
+    end
+
+    it "sends unblock to the restore route" do
+      request = stub_lead_post("1/restore")
+
+      expect(client.leads.unblock(1).success?).to eq(true)
+      expect(request).to have_been_requested
+    end
+
+    it "sends set_follow_up to the follow_up route" do
+      request = stub_lead_post("1/follow_up", body: { follow_up_at: "2026-09-01 18:30:00" }.to_json)
+
+      expect(client.leads.set_follow_up(1, "2026-09-01 18:30:00").success?).to eq(true)
+      expect(request).to have_been_requested
+    end
+
+    it "assigns and unassigns a lead" do
+      assignment = stub_lead_post("1/assign", body: { member_email: "agent@example.com" }.to_json)
+      removal    = stub_lead_post("1/unassign", body: {}.to_json)
+
+      client.leads.assign(1, "agent@example.com")
+      client.leads.unassign(1)
+
+      expect(assignment).to have_been_requested
+      expect(removal).to have_been_requested
+    end
+
+    it "no longer exposes reset, which has no route on the server" do
+      expect(client.leads).not_to respond_to(:reset)
+    end
+  end
+
   it "searches global dids" do
     stub_request(:get, "https://phonomenal.voizworks.com/api/v1/global_dids")
       .to_return(status: 200, body: { success: true, global_dids: [{ did: "0802332332222" }] }.to_json)

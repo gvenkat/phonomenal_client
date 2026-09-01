@@ -6,3 +6,8 @@ Style/StringLiterals:
 
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
+
+# RSpec describe/context blocks are long by nature; the metric is not meaningful here.
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*"

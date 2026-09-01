@@ -327,10 +327,13 @@ client.leads.update(lead_id, { full_name: "Jane Smith" })
 
 # State changes
 client.leads.block(lead_id)
-client.leads.unblock(lead_id)
-client.leads.bump(lead_id)
+client.leads.restore(lead_id)          # `unblock` is an alias of this
 client.leads.unbump(lead_id)
 client.leads.unset_follow_up(lead_id)
+
+# Prioritise a lead in the dialling queue
+client.leads.bump(lead_id)                                        # due immediately
+client.leads.bump(lead_id, bump_at: "2026-04-01T10:00:00Z")       # due at that time
 
 # Assignment and scheduling
 client.leads.assign(lead_id, "agent@example.com")
@@ -338,15 +341,17 @@ client.leads.unassign(lead_id)
 client.leads.set_follow_up(lead_id, "2026-04-01T10:00:00Z")
 ```
 
+`bump_at` is when the lead becomes *due* for priority rather than a record of when the bump
+was made, so a future time schedules the bump instead of applying it now. Omit it to bump
+from the current time.
+
 `lead` accepts `custom_unique_reference`, `full_name`, `email`, `phone`, `member_email`,
 `follow_up_at`, `custom_data` (a free-form hash).
 
-> **Note:** the client's `unblock`, `reset`, and `set_follow_up` methods currently POST to
-> `/leads/:id/unblock`, `/leads/:id/reset`, and `/leads/:id/set_follow_up` respectively. The
-> server's actual routes for these are `restore` (unblock a lead) and `follow_up` (set the
-> follow-up date) — there is no `reset` route at all. As shipped, `unblock`/`reset`/`set_follow_up`
-> will 404 against the real server; only `restore` and `follow_up` work server-side. Use with
-> caution until the client and server are reconciled.
+> **Changed in 0.6.0:** `unblock` and `set_follow_up` used to POST to `/leads/:id/unblock`
+> and `/leads/:id/set_follow_up`, neither of which is a route on the server, so both always
+> 404'd. They now reach `restore` and `follow_up` respectively. `reset` has been removed —
+> the server has never had a `reset` route.
 >
 > The server also exposes bulk endpoints (`POST /leads/bulk/create`, `PATCH /leads/bulk/update`,
 > `DELETE /leads/bulk/remove`) that the client does not currently wrap.
