@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-08
+
+### Added
+- `leads.unassign_all(member_email)` clears every lead held by one agent in a single call,
+  hitting the new `POST /leads/unassign_all` collection route. It returns
+  `unassigned_count` rather than a lead, and 404s when no member in the campaign has that
+  email.
+
 ## [0.6.0] - 2026-09-01
 
 ### Added

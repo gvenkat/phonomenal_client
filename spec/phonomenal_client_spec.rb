@@ -227,6 +227,28 @@ RSpec.describe Phonomenal::Client do
       expect(removal).to have_been_requested
     end
 
+    it "unassigns every lead held by one agent" do
+      request = stub_request(:post, "#{base}/unassign_all")
+                .with(body: { member_email: "agent@example.com" }.to_json)
+                .to_return(status: 200, body: { success: true, unassigned_count: 4 }.to_json)
+
+      response = client.leads.unassign_all("agent@example.com")
+
+      expect(response.success?).to eq(true)
+      expect(request).to have_been_requested
+    end
+
+    it "unassign_all posts to the collection route, not a member route" do
+      member_route = stub_lead_post("unassign_all/unassign")
+
+      stub_request(:post, "#{base}/unassign_all")
+        .to_return(status: 200, body: { success: true, unassigned_count: 0 }.to_json)
+
+      client.leads.unassign_all("agent@example.com")
+
+      expect(member_route).not_to have_been_requested
+    end
+
     it "no longer exposes reset, which has no route on the server" do
       expect(client.leads).not_to respond_to(:reset)
     end

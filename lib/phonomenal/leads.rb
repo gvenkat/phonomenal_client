@@ -51,5 +51,12 @@ module Phonomenal
     def unassign(lead_id)
       make_response :post, "/leads/#{lead_id}/unassign", body: {}.to_json
     end
+
+    # Clear every lead currently held by one agent, identified by email as the
+    # single-lead `assign` is. Responds with `unassigned_count` rather than a
+    # lead, and 404s if the campaign has no member with that email.
+    def unassign_all(member_email)
+      make_response :post, "/leads/unassign_all", body: { member_email: member_email }.to_json
+    end
   end
 end

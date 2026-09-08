@@ -338,8 +338,23 @@ client.leads.bump(lead_id, bump_at: "2026-04-01T10:00:00Z")       # due at that 
 # Assignment and scheduling
 client.leads.assign(lead_id, "agent@example.com")
 client.leads.unassign(lead_id)
+client.leads.unassign_all("agent@example.com")   # clears that agent's whole book
 client.leads.set_follow_up(lead_id, "2026-04-01T10:00:00Z")
 ```
+
+`unassign_all` is a collection call: it takes an agent's email rather than a lead id and
+clears `member` on every lead that agent currently holds. It returns a count instead of a
+lead, and 404s if no member in the campaign has that email:
+
+```ruby
+response = client.leads.unassign_all("agent@example.com")
+response.success?                 # => true
+response.body["unassigned_count"] # => 37, or 0 if they held nothing
+```
+
+Reach for it when an agent leaves or moves queue. Deactivating a member already releases
+their leads; this clears them without deactivating. On a campaign using sticky agents the
+released leads become unowned and return to the pool every free agent can draw from.
 
 `bump_at` is when the lead becomes *due* for priority rather than a record of when the bump
 was made, so a future time schedules the bump instead of applying it now. Omit it to bump
