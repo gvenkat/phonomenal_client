@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "phonomenal/response"
+require "phonomenal/audio_response"
 
 module Phonomenal
   class ApiHandler # rubocop:disable Style/Documentation
@@ -29,7 +30,7 @@ module Phonomenal
         args = if data.nil?
                  {}
                else
-                 method_name == :post ? { body: data.to_json } : { query: data }
+                 method == :post ? { body: data.to_json } : { query: data }
                end
 
         # URL

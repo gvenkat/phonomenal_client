@@ -268,4 +268,58 @@ RSpec.describe Phonomenal::Client do
     expect(response.success?).to eq(true)
     expect(response.json["global_dids"]).to eq([])
   end
+
+  describe "voice message audio" do
+    let(:base) { "https://phonomenal.voizworks.com/api/v1/voice_messages" }
+    let(:wav)  { "RIFF....WAVEfmt " }
+
+    it "fetches the generated audio" do
+      stub_request(:get, "#{base}/7/audio")
+        .to_return(status: 200, body: wav, headers: { "Content-Type" => "audio/wav" })
+
+      audio = client.voice_messages.audio(7)
+      expect(audio.success?).to eq(true)
+      expect(audio.content_type).to eq("audio/wav")
+      expect(audio.body).to eq(wav)
+    end
+
+    it "reports the server's error when the audio isn't ready" do
+      stub_request(:get, "#{base}/7/audio")
+        .to_return(status: 404, body: { success: false, message: "Not found" }.to_json,
+                   headers: { "Content-Type" => "application/json" })
+
+      audio = client.voice_messages.audio(7)
+      expect(audio.success?).to eq(false)
+      expect(audio.json["message"]).to eq("Not found")
+    end
+
+    it "previews the message for a lead's values, as a JSON body" do
+      stub = stub_request(:post, "#{base}/7/preview")
+             .with(body: { lead: { full_name: "Asha", custom_data: { "EMI" => "Rs. 500" } } }.to_json)
+             .to_return(status: 200, body: wav, headers: { "Content-Type" => "audio/wav",
+                                                           "X-Voice-Message-Text" => "Hi%20Asha" })
+
+      audio = client.voice_messages.preview(7, lead: { full_name: "Asha", custom_data: { "EMI" => "Rs. 500" } })
+      expect(stub).to have_been_requested
+      expect(audio.success?).to eq(true)
+      expect(audio.text).to eq("Hi Asha")
+    end
+  end
+
+  it "sends add_method! POST data as a JSON body" do
+    stub = stub_request(:post, "https://phonomenal.voizworks.com/api/v1/sip_configs/borrow")
+           .with(body: { count: 2 }.to_json)
+           .to_return(status: 200, body: { success: true }.to_json, headers: { "Content-Type" => "application/json" })
+
+    client.sip_configs.borrow(nil, { count: 2 })
+    expect(stub).to have_been_requested
+  end
+
+  it "passes unknown methods on a response to the HTTP response" do
+    stub_request(:get, "https://phonomenal.voizworks.com/api/v1/voice_messages")
+      .to_return(status: 200, body: { success: true,
+                                      voice_messages: [] }.to_json, headers: { "Content-Type" => "application/json" })
+
+    expect(client.voice_messages.list.code).to eq(200)
+  end
 end

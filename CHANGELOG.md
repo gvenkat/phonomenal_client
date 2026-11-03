@@ -1,5 +1,24 @@
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-03
+
+### Added
+- `voice_messages.audio(id)` fetches a voice message's generated audio (WAV), and
+  `voice_messages.preview(id, lead: {...})` the message read for one lead's values. Both
+  return a `Phonomenal::AudioResponse`: `success?`, `body` (the bytes), `content_type`,
+  `text` (what a preview reads) and `json` (the error, on failure).
+- Voice messages take a `voice_id` (from `voices.list`), and show `voice_label`,
+  `personalized` and their audio's `audio_status`, `audio_error`, `audio_duration_seconds`
+  and `audio_generated_at`.
+- Campaigns take a `voice_message_webhook_url`, which Phonomenal POSTs to
+  (`event: "voice_message.audio_generated"`) when a voice message's audio is ready or fails.
+
+### Fixed
+- Methods added with `add_method!` sent POST data as query parameters; they now send it
+  as a JSON body.
+- `Phonomenal::Response` now passes unknown methods (`body`, `code`, `headers`) to the
+  HTTP response, as intended; the hook was misspelt.
+
 ## [0.7.0] - 2026-09-08
 
 ### Added

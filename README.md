@@ -284,8 +284,31 @@ client.voice_messages.update(voice_message_id, { voice_message: { message_text: 
 | Key | Type | Notes |
 |---|---|---|
 | `language_name` | string | ISO 639-1 code (see [Languages](#languages)), required |
-| `message_text` | string | required; supports `{{lead_field}}` personalization tokens |
+| `message_text` | string | required; supports `{{full_name}}` and `{{custom_data['EMI']}}` personalization tokens, with defaults for blank values: `{{ full_name \| default: "there" }}` |
 | `is_default` | boolean | |
+| `voice_id` | string | a voice `id` from [Voices](#voices); blank picks a female Indian voice for the language |
+
+Saving a message generates its audio in the background — the message itself, or a sample read
+with the default values when it's personalized. Each message reports `audio_status`
+(`pending`, `generating`, `ready`, `failed`), `audio_error`, `audio_duration_seconds` and
+`audio_generated_at`, and the campaign's `voice_message_webhook_url` (see Campaign) is POSTed
+when generation finishes:
+
+```json
+{ "event": "voice_message.audio_generated", "campaign_token": "...", "voice_message": { "id": 1, "audio_status": "ready", "...": "..." } }
+```
+
+The audio itself:
+
+```ruby
+audio = client.voice_messages.audio(voice_message_id)          # the generated audio (404 until ready)
+audio = client.voice_messages.preview(voice_message_id, lead: { full_name: "Asha", custom_data: { "EMI" => "Rs. 500" } })
+
+audio.success?      # => true
+audio.content_type  # => "audio/wav"
+audio.body          # => the WAV's bytes
+audio.text          # => "Hi Asha, your EMI of Rs. 500 is due" (previews)
+```
 
 > **Note:** the client also exposes `client.voice_messages.show(id)` and
 > `client.voice_messages.destroy(id)`, but the server currently only routes
