@@ -10,10 +10,14 @@ module Phonomenal
       http_response.code == 200 && http_response.parsed_response["success"]
     end
 
-    def method_messing(method, *args, **kwargs)
-      return http_response.send(method, *args, **kwargs) if http_response.respond_to?(method)
+    def method_missing(method, *args, **kwargs, &block)
+      return http_response.send(method, *args, **kwargs, &block) if http_response.respond_to?(method)
 
       super
+    end
+
+    def respond_to_missing?(method, include_private = false)
+      http_response.respond_to?(method, include_private) || super
     end
   end
 end

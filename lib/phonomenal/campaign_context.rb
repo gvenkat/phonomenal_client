@@ -73,9 +73,27 @@ module Phonomenal
             allowed_methods: %i[index create update show destroy],
             singular: false
           )
+          handler.extend(VoiceMessageAudio) if method == "voice_messages"
           instance_variable_set(:"@#{method}", handler)
         end
         handler
+      end
+    end
+
+    # The audio of a campaign's voice messages
+    module VoiceMessageAudio
+      # The generated audio: the message, or a sample read with its default
+      # values when it's personalized. Fails (404) until it's generated.
+      def audio(id)
+        Phonomenal::AudioResponse.new(client.get(url_for("#{path}/#{id}/audio"), format: :plain))
+      end
+
+      # The message read for one lead: lead is a hash of full_name, email,
+      # phone, language and custom_data ({ "EMI" => "Rs. 500" }). Missing
+      # values fall back to the message's defaults.
+      def preview(id, lead: {})
+        Phonomenal::AudioResponse.new(client.post(url_for("#{path}/#{id}/preview"), body: { lead: lead }.to_json,
+                                                                                    format: :plain))
       end
     end
 
