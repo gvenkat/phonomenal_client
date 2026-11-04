@@ -306,6 +306,30 @@ RSpec.describe Phonomenal::Client do
     end
   end
 
+  describe "the campaign's voice message audio" do
+    let(:base) { "https://phonomenal.voizworks.com/api/v1/campaign" }
+    let(:wav)  { "RIFF....WAVEfmt " }
+
+    it "fetches the generated audio" do
+      stub_request(:get, "#{base}/voice_message_audio")
+        .to_return(status: 200, body: wav, headers: { "Content-Type" => "audio/wav" })
+
+      audio = client.campaign.voice_message_audio
+      expect(audio.success?).to eq(true)
+      expect(audio.body).to eq(wav)
+    end
+
+    it "previews it for a lead's values" do
+      stub = stub_request(:post, "#{base}/voice_message_preview")
+             .with(body: { lead: { full_name: "Asha" } }.to_json)
+             .to_return(status: 200, body: wav, headers: { "Content-Type" => "audio/wav", "X-Voice-Message-Text" => "Hi%20Asha" })
+
+      audio = client.campaign.voice_message_preview(lead: { full_name: "Asha" })
+      expect(stub).to have_been_requested
+      expect(audio.text).to eq("Hi Asha")
+    end
+  end
+
   it "sends add_method! POST data as a JSON body" do
     stub = stub_request(:post, "https://phonomenal.voizworks.com/api/v1/sip_configs/borrow")
            .with(body: { count: 2 }.to_json)

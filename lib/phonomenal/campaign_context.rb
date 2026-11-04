@@ -11,6 +11,7 @@ module Phonomenal
         singular: true
       ).tap do |handler|
         handler.add_method!(method_name: :clear_webhooks, method: :delete, url_path: "webhooks")
+        handler.extend(CampaignVoiceMessageAudio)
       end
     end
 
@@ -94,6 +95,22 @@ module Phonomenal
       def preview(id, lead: {})
         Phonomenal::AudioResponse.new(client.post(url_for("#{path}/#{id}/preview"), body: { lead: lead }.to_json,
                                                                                     format: :plain))
+      end
+    end
+
+    # The audio of the campaign's own voice message: what automated calls fall
+    # back to without a matching or default voice message
+    module CampaignVoiceMessageAudio
+      # Its generated audio (a sample with default values when personalized).
+      # Fails (404) until it's generated.
+      def voice_message_audio
+        Phonomenal::AudioResponse.new(client.get(url_for("#{path}/voice_message_audio"), format: :plain))
+      end
+
+      # The message read for one lead, as voice_messages.preview
+      def voice_message_preview(lead: {})
+        Phonomenal::AudioResponse.new(client.post(url_for("#{path}/voice_message_preview"), body: { lead: lead }.to_json,
+                                                                                            format: :plain))
       end
     end
 
