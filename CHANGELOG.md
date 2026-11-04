@@ -1,5 +1,15 @@
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-05
+
+### Added
+- `campaign.voice_message_audio` fetches the audio of the campaign's own voice message
+  (what automated calls fall back to), and `campaign.voice_message_preview(lead: {...})`
+  reads it for one lead's values. Both return a `Phonomenal::AudioResponse`.
+- The campaign's JSON has `voice_message_audio` (`personalized`, `audio_status`,
+  `audio_error`, `audio_duration_seconds`, `audio_generated_at`), and
+  `voice_message_webhook_url` also gets `event: "campaign.voice_message_audio_generated"`.
+
 ## [0.8.0] - 2026-11-03
 
 ### Added

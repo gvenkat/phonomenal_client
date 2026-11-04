@@ -310,6 +310,15 @@ audio.body          # => the WAV's bytes
 audio.text          # => "Hi Asha, your EMI of Rs. 500 is due" (previews)
 ```
 
+The campaign's own voice message (what calls fall back to without a matching or
+default voice message) has audio too. Its state is in `client.campaign.show`'s
+`voice_message_audio`, and the webhook gets `event: "campaign.voice_message_audio_generated"`.
+
+```ruby
+audio = client.campaign.voice_message_audio                       # 404 until ready
+audio = client.campaign.voice_message_preview(lead: { full_name: "Asha" })
+```
+
 > **Note:** the client also exposes `client.voice_messages.show(id)` and
 > `client.voice_messages.destroy(id)`, but the server currently only routes
 > `index`/`create`/`update` for this resource — `show` and `destroy` will 404.
