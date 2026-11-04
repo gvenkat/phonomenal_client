@@ -109,8 +109,8 @@ module Phonomenal
 
       # The message read for one lead, as voice_messages.preview
       def voice_message_preview(lead: {})
-        Phonomenal::AudioResponse.new(client.post(url_for("#{path}/voice_message_preview"), body: { lead: lead }.to_json,
-                                                                                            format: :plain))
+        url = url_for("#{path}/voice_message_preview")
+        Phonomenal::AudioResponse.new(client.post(url, body: { lead: lead }.to_json, format: :plain))
       end
     end
 

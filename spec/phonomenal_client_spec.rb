@@ -322,7 +322,8 @@ RSpec.describe Phonomenal::Client do
     it "previews it for a lead's values" do
       stub = stub_request(:post, "#{base}/voice_message_preview")
              .with(body: { lead: { full_name: "Asha" } }.to_json)
-             .to_return(status: 200, body: wav, headers: { "Content-Type" => "audio/wav", "X-Voice-Message-Text" => "Hi%20Asha" })
+             .to_return(status: 200, body: wav,
+                        headers: { "Content-Type" => "audio/wav", "X-Voice-Message-Text" => "Hi%20Asha" })
 
       audio = client.campaign.voice_message_preview(lead: { full_name: "Asha" })
       expect(stub).to have_been_requested
