@@ -12,6 +12,7 @@ module Phonomenal
       ).tap do |handler|
         handler.add_method!(method_name: :clear_webhooks, method: :delete, url_path: "webhooks")
         handler.extend(CampaignVoiceMessageAudio)
+        handler.extend(CampaignIvr)
       end
     end
 
@@ -64,7 +65,7 @@ module Phonomenal
       )
     end
 
-    %w[member_groups black_list_phones holidays inbound_schedule_entries voice_messages].each do |method|
+    %w[member_groups member_tags black_list_phones holidays inbound_schedule_entries voice_messages].each do |method|
       define_method method do # rubocop:disable Metrics/MethodLength
         handler = instance_variable_get(:"@#{method}")
         unless handler
@@ -111,6 +112,27 @@ module Phonomenal
       def voice_message_preview(lead: {})
         url = url_for("#{path}/voice_message_preview")
         Phonomenal::AudioResponse.new(client.post(url, body: { lead: lead }.to_json, format: :plain))
+      end
+    end
+
+    # The campaign's IVR menu tree: whether it plays, its welcome message, the
+    # main menu's options and sub menus, down to sub sub menus. In a sub menu
+    # callers press * for the previous menu and 0 for the main menu.
+    module CampaignIvr
+      # The tree, under "ivr": play_ivr_menu, welcome_message, custom_audio,
+      # taken_digits (the main menu's member group and tag digits), options
+      # and menus
+      def ivr
+        Phonomenal::Response.new(client.get(url_for("#{path}/ivr")))
+      end
+
+      # Replaces the whole tree. options: [{ digit:, member_tag_id: } or
+      # { digit:, member_group_id: }]; menus: [{ digit:, label:, message:,
+      # options: [...], menus: [...] }]. play_ivr_menu and welcome_message
+      # are optional. Nothing changes if any of it is invalid (422, with
+      # "errors" naming the menu).
+      def update_ivr(ivr)
+        Phonomenal::Response.new(client.put(url_for("#{path}/ivr"), body: { ivr: ivr }.to_json))
       end
     end
 
