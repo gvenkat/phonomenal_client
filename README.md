@@ -323,6 +323,30 @@ audio = client.campaign.voice_message_preview(lead: { full_name: "Asha" })
 > `client.voice_messages.destroy(id)`, but the server currently only routes
 > `index`/`create`/`update` for this resource — `show` and `destroy` will 404.
 
+### IVR menus
+
+The campaign's IVR goes three levels deep: main menu > sub menu > sub sub menu. A
+digit routes to a member tag or group, or opens a deeper menu. In a sub menu callers
+press `*` for the previous menu and `0` for the main menu (on the main menu, `0`
+repeats it). Digits the main menu already gives member groups and tags are listed
+in `taken_digits`.
+
+```ruby
+client.campaign.ivr.json["ivr"]   # play_ivr_menu, welcome_message, taken_digits, options, menus
+
+client.campaign.update_ivr(
+  play_ivr_menu: true,
+  welcome_message: "Welcome to Acme.",
+  options: [{ digit: 2, member_tag_id: 7 }],
+  menus: [
+    { digit: 3, label: "Support", message: "Support.",
+      options: [{ digit: 1, member_tag_id: 8 }],
+      menus: [{ digit: 2, label: "Billing", options: [{ digit: 1, member_group_id: 4 }] }] }
+  ]
+)
+# Replaces the whole tree; nothing changes if any part is invalid (422, "errors")
+```
+
 ### Calls
 
 ```ruby

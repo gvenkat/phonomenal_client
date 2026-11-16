@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-16
+
+### Added
+- `campaign.ivr` reads the campaign's IVR menu tree and `campaign.update_ivr(...)` replaces it:
+  main menu options and sub menus, down to sub sub menus (three levels). Options route a digit
+  to a member tag or group; in a sub menu callers press `*` for the previous menu and `0` for
+  the main menu.
+- `member_tags` handler (`list`, `create`, `update`, `show`, `destroy`).
+
 ## [0.9.0] - 2026-11-05
 
 ### Added

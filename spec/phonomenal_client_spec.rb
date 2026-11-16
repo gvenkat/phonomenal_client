@@ -125,6 +125,34 @@ RSpec.describe Phonomenal::Client do
     expect(response.success?).to eq(true)
   end
 
+  describe "campaign IVR" do
+    let(:url) { "https://phonomenal.voizworks.com/api/v1/campaign/ivr" }
+
+    it "reads the menu tree" do
+      body = { success: true, ivr: { menus: [] } }.to_json
+      stub_request(:get, url).to_return(status: 200, body: body, headers: { "Content-Type" => "application/json" })
+
+      expect(client.campaign.ivr.json.dig("ivr", "menus")).to eq([])
+    end
+
+    it "replaces the menu tree with a PUT" do
+      tree = { options: [{ digit: 2, member_tag_id: 7 }],
+               menus: [{ digit: 3, label: "Support", menus: [{ digit: 1, label: "Billing" }] }] }
+      request = stub_request(:put, url).with(body: { ivr: tree }.to_json)
+                                       .to_return(status: 200, body: { success: true }.to_json)
+
+      expect(client.campaign.update_ivr(tree)).to be_success
+      expect(request).to have_been_requested
+    end
+  end
+
+  it "lists member tags" do
+    stub_request(:get, "https://phonomenal.voizworks.com/api/v1/member_tags")
+      .to_return(status: 200, body: { success: true, member_tags: [] }.to_json)
+
+    expect(client.member_tags.list).to be_success
+  end
+
   it "has a method to remove all webhooks from campaign" do
     stub_request(:delete, "https://phonomenal.voizworks.com/api/v1/campaign/webhooks")
       .to_return(status: 200, body: { success: true, sessions: [{ token: "blah", started: "blah" }] }.to_json)
